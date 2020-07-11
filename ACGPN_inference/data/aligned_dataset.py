@@ -13,6 +13,13 @@ class AlignedDataset(BaseDataset):
         self.opt = opt
         self.root = opt.dataroot    
         self.diction={}
+
+        ### debug yichuc restore
+        dir_external_cloth = os.path.join(opt.dataroot, opt.phase + '_external_cloth')
+        self.external_cloth_paths = sorted(make_dataset(dir_external_cloth))
+        dir_external_cloth_mask = os.path.join(opt.dataroot, opt.phase + '_external_cloth_mask')
+        self.external_cloth_mask_paths = sorted(make_dataset(dir_external_cloth_mask))
+
         ### input A (label maps)
         if opt.isTrain or opt.use_encoded_image:
             dir_A = '_A' if self.opt.label_nc == 0 else '_label'
@@ -114,12 +121,11 @@ class AlignedDataset(BaseDataset):
         #    if '006581' in s:
         #        test = k
         #        break
+
         A_path = self.A_paths[index]
         AR_path = self.AR_paths[index]
         A = Image.open(A_path).convert('L')
         AR = Image.open(AR_path).convert('L')
-
-
   
         params = get_params(self.opt, A.size)
         if self.opt.label_nc == 0:
@@ -196,9 +202,21 @@ class AlignedDataset(BaseDataset):
             one_map = transform_B(one_map.convert('RGB'))
             pose_map[i] = one_map[0]
         P_tensor=pose_map
+
+        # debug yichuc restore
+        external_cloth_path = self.external_cloth_paths[index]
+        external_cloth = Image.open(external_cloth_path).convert('RGB')
+        external_cloth_tensor = transform_A(external_cloth)
+        external_cloth_mask_path = self.external_cloth_mask_paths[index]
+        external_cloth_mask = Image.open(external_cloth_mask_path).convert('L')
+        external_cloth_mask_tensor = transform_A(external_cloth_mask)
+        print('debug yichuc external paths {} {}'.format(external_cloth_path, external_cloth_mask_path))
+
+
         if self.opt.isTrain:
             input_dict = { 'label': A_tensor, 'label_ref': AR_tensor, 'image': B_tensor, 'image_ref': BR_tensor, 'path': A_path, 'path_ref': AR_path,
-                            'edge': E_tensor,'color': C_tensor, 'mask': M_tensor, 'colormask': MC_tensor,'pose':P_tensor,'name':name
+                            'edge': E_tensor,'color': C_tensor, 'mask': M_tensor, 'colormask': MC_tensor,'pose':P_tensor,'name':name,
+                            'external_cloth': external_cloth_tensor, 'external_cloth_mask': external_cloth_mask_tensor
                           }
         else:
             input_dict = {'label': A_tensor, 'label_ref': AR_tensor, 'image': B_tensor, 'image_ref': BR_tensor, 'path': A_path, 'path_ref': AR_path}
