@@ -1,6 +1,7 @@
 import time
 from collections import OrderedDict
 from options.train_options import TrainOptions
+from options.test_options import TestOptions
 from data.data_loader import CreateDataLoader
 from models.models import create_model
 import util.util as util
@@ -65,6 +66,9 @@ def changearm(old_label):
     return label
 os.makedirs('sample',exist_ok=True)
 opt = TrainOptions().parse()
+#opt.isTrain = False
+#opt.use_encoded_image = False
+print('debug yichuc opt.phase {}'.format(opt.phase))
 iter_path = os.path.join(opt.checkpoints_dir, opt.name, 'iter.txt')
 if opt.continue_train:
     try:
@@ -86,6 +90,7 @@ data_loader = CreateDataLoader(opt)
 dataset = data_loader.load_data()
 dataset_size = len(data_loader)
 print('# Inference images = %d' % dataset_size)
+print('debug yichuc opt {}'.format(opt.isTrain))
 
 model = create_model(opt)
 
@@ -127,7 +132,8 @@ for epoch in range(start_epoch, opt.niter + opt.niter_decay + 1):
 
 
         ############## Forward Pass ######################
-        losses, fake_image, real_image, input_label,L1_loss,style_loss,clothes_mask,CE_loss,rgb,alpha= model(Variable(data['label'].cuda()),Variable(data['edge'].cuda()),Variable(img_fore.cuda()),Variable(mask_clothes.cuda())
+        losses, fake_image, real_image, input_label,L1_loss,style_loss,clothes_mask,CE_loss,rgb,alpha = 
+                model.forward(Variable(data['label'].cuda()),Variable(data['edge'].cuda()),Variable(img_fore.cuda()),Variable(mask_clothes.cuda())
                                                                                                     ,Variable(data['color'].cuda()),Variable(all_clothes_label.cuda()),Variable(data['image'].cuda()),Variable(data['pose'].cuda()) ,Variable(data['image'].cuda()) ,Variable(mask_fore.cuda()))
 
         # sum per device losses

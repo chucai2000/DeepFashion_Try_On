@@ -106,7 +106,10 @@ class AlignedDataset(BaseDataset):
         #     if '000386' in x :
         #         index=k
         #         break
-        test=np.random.randint(2032)
+
+        # debug yichuc restore
+        #test=np.random.randint(2032)
+        test = 0
         # for k, s in enumerate(self.B_paths):
         #    if '006581' in s:
         #        test = k
@@ -157,6 +160,7 @@ class AlignedDataset(BaseDataset):
 
         ### input_C (color)
         # print(self.C_paths)
+        print('debug test {} {}'.format(test, len(self.C_paths)))
         C_path = self.C_paths[test]
         C = Image.open(C_path).convert('RGB')
         C_tensor = transform_B(C)
@@ -198,6 +202,17 @@ class AlignedDataset(BaseDataset):
                           }
         else:
             input_dict = {'label': A_tensor, 'label_ref': AR_tensor, 'image': B_tensor, 'image_ref': BR_tensor, 'path': A_path, 'path_ref': AR_path}
+
+        print('debug A_path {}'.format(A_path))
+        print('debug AR_path {}'.format(AR_path))
+        print('debug B_path {}'.format(B_path))
+        #print('debug BR_path {}'.format(BR_path))
+        #print('debug M_path {}'.format(M_path))
+        #print('debug MR_path {}'.format(MR_path))
+        #print('debug MCR_path {}'.format(MCR_path))
+        #print('debug C_path {}'.format(C_path))
+        #print('debug E_path {}'.format(E_path))
+        #print('debug path {} {} {} {} {} {}'.format(self.dir_A, self.dir_B, self.dir_C, self.dir_E, self.dir_M, self.dir_MC))
 
         return input_dict
 
